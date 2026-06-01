@@ -22,7 +22,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("antialiased", fontMono.variable, "font-sans", figtree.variable)}
     >
-      <body>
+      <body className="bg-[#f5f5f5]">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

@@ -6,6 +6,9 @@
     "turbo": "^2.9.16"
   },
   "packageManager": "bun@1.3.13",
+  "scripts": {
+    "dev": "turbo dev"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
