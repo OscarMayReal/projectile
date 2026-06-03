@@ -14,39 +14,50 @@ datasource db {
 }
 
 model User {
-  id                    String    @id @default(cuid())
+  id                    String    @id @default(uuid())
   email                 String    @unique
   name                  String
   userConnectionId      String
   accountConnectionType AccountConnectionType @default(KeyStone)
   projectPermissions    ProjectPermission[]
+  createdBoards         Board[] @relation("BoardToCreator")
 }
 
 model ProjectPermission {
-  id String @id @default(cuid())
+  id String @id @default(uuid())
   userId String
   user User @relation(fields: [userId], references: [id])
   projectId String
-  project Project @relation(fields: [projectId], references: [id])
+  project Project @relation(fields: [projectId], references: [id], name: "ProjectToPermission")
   permissionLevel ProjectPermissionLevel
 }
 
 model Project {
+  id String @id @default(uuid())
+  name String
+  permissions ProjectPermission[] @relation("ProjectToPermission")
+  boards Board[] @relation("ProjectToBoard")
+}
+
+model Board {
   iconName String?
   color String? @default("#0c9d6d")
-  id String @id @default(cuid())
-  projectPermissions ProjectPermission[]
+  id String @id @default(uuid())
   name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   description String?
+  createdBy String
+  creatorUser User @relation(fields: [createdBy], references: [id], name: "BoardToCreator")
   states State[]
+  project Project @relation(fields: [projectId], references: [id], name: "ProjectToBoard")
+  projectId String
 }
 
 model State {
-  id String @id @default(cuid())
-  projectId String
-  project Project @relation(fields: [projectId], references: [id])
+  id String @id @default(uuid())
+  boardId String
+  board Board @relation(fields: [boardId], references: [id])
   name String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

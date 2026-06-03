@@ -38,7 +38,8 @@ export default function Index() {
     <View style={styles.container}>
       <Text style={styles.title}>Projectile</Text>
       <Text style={styles.subtitle}>
-        Sign in with Keystone to keep your mobile session in sync with the web app.
+        Project management for fast-moving teams. the powerful all-in-one
+        platform for project management.
       </Text>
       <Pressable
         style={({ pressed }) => [

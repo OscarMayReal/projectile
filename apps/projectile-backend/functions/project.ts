@@ -1,5 +1,5 @@
 import type { version_with_sha } from "bun";
-import { PrismaClient, ProjectPermissionLevel, StateType } from "../generated/prisma/client";
+import { PrismaClient, ProjectPermissionLevel } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const prisma = new PrismaClient({
@@ -9,47 +9,42 @@ const prisma = new PrismaClient({
 
 export async function createProject({
   name,
-  description,
   userId,
 }: {
   name: string;
-  description: string;
   userId: string;
 }) {
   const project = await prisma.project.create({
     data: {
       name,
-      description,
-      projectPermissions: {
+      permissions: {
         create: {
           userId,
           permissionLevel: ProjectPermissionLevel.Admin,
         },
       },
-      states: {
-        create: [
-            {
-                name: "To Do",
-                color: "#6b7280",
-                type: StateType.Open,
-            },
-            {
-                name: "In Progress",
-                color: "#3b82f6",
-                type: StateType.InProgress,
-            },
-            {
-                name: "Review",
-                color: "#f59e0b",
-                type: StateType.Done,
-            },
-            {
-                name: "Done",
-                color: "#10b981",
-                type: StateType.Closed,
-            },
-        ]
+    },
+  });
+  return project;
+}
+
+export async function getProjectsByUserId(userId: string) {
+  const projects = await prisma.project.findMany({
+    where: {
+      permissions: {
+        some: {
+          userId,
+        },
       },
+    },
+  });
+  return projects;
+}
+
+export async function getProjectById(projectId: string) {
+  const project = await prisma.project.findUnique({
+    where: {
+      id: projectId,
     },
   });
   return project;

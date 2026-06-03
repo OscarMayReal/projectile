@@ -11,15 +11,16 @@ export function UserItem() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="h-auto">
-                    <Item className="p-0">
+                    {/* <Item className="p-0">
                         <ItemMedia>
                             <UserIcon />
                         </ItemMedia>
                         <ItemContent>
                             <ItemTitle>{user?.user.name || 'User'}</ItemTitle>
-                            {/* <ItemDescription>{user?.user.email || 'Email'}</ItemDescription> */}
                         </ItemContent>
-                    </Item>
+                    </Item> */}
+                    <UserIcon />
+                    {user?.user.name || 'User'}
                 </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
