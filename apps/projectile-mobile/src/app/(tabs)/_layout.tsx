@@ -41,12 +41,12 @@ export default function TabsLayout() {
         />
         <NativeTabs.Trigger.Label>Reports</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="admin">
+      <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Icon
           md={{ default: "settings", selected: "settings" }}
           sf={{ default: "gear.circle", selected: "gear.circle.fill" }}
         />
-        <NativeTabs.Trigger.Label>Admin</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="search" role="search">
         <NativeTabs.Trigger.Icon
