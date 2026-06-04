@@ -1,5 +1,4 @@
-import type { version_with_sha } from "bun";
-import { PrismaClient, ProjectPermissionLevel, StateType } from "../generated/prisma/client";
+import { PrismaClient, StateType } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const prisma = new PrismaClient({

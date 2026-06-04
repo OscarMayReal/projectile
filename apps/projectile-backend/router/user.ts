@@ -1,5 +1,11 @@
 import express from "express";
 import { VerifySession } from "keystone-lib";
+import { AccountConnectionType, PrismaClient, ProjectPermissionLevel, StateType } from "../generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+
+const prisma = new PrismaClient({
+    adapter: new PrismaPg(process.env.DATABASE_URL!),
+})
 
 const router = express.Router();
 
@@ -51,6 +57,26 @@ router.post("/session", async (req, res) => {
     appSecret: process.env.APP_SECRET!,
     sessionId,
   });
+
+  const user = await prisma.user.upsert({
+    where: {
+      userConnectionId_accountConnectionType: {
+        userConnectionId: ud.user.id,
+        accountConnectionType: AccountConnectionType.KeyStone,
+      },
+    },
+    create: {
+      email: ud.user.email!,
+      name: ud.user.name!,
+      userConnectionId: ud.user.id,
+      accountConnectionType: AccountConnectionType.KeyStone,
+    },
+    update: {
+      email: ud.user.email!,
+      name: ud.user.name!,
+    },
+  });
+
   res.json(ud);
 });
 

@@ -1,4 +1,3 @@
-import type { version_with_sha } from "bun";
 import { PrismaClient, ProjectPermissionLevel } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 

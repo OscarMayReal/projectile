@@ -21,6 +21,7 @@ model User {
   accountConnectionType AccountConnectionType @default(KeyStone)
   projectPermissions    ProjectPermission[]
   createdBoards         Board[] @relation("BoardToCreator")
+  @@unique([userConnectionId, accountConnectionType])
 }
 
 model ProjectPermission {
