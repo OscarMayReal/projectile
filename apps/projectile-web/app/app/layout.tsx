@@ -2,7 +2,7 @@ import { Command, ListIcon, SearchIcon, SettingsIcon } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenuButton, SidebarProvider, SidebarRail } from "@/components/ui/sidebar"
 import { AuthManager } from "@/components/auth/authManager"
 import { UserItem } from "@/components/auth/userItem"
-import { TeamSwitcher } from "@/components/app/project-switcher"
+import { ProjectSwitcher } from "@/components/app/project-switcher"
 
 export default function AppLayout({
   children,
@@ -17,7 +17,7 @@ export default function AppLayout({
                 // variant={"floating"}
             >
                 <SidebarHeader>
-                    <TeamSwitcher />
+                    <ProjectSwitcher />
                 </SidebarHeader>
                 <SidebarContent>
                     <SidebarGroup className="pt-0">

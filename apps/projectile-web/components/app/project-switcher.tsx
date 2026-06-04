@@ -17,8 +17,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { useRouter } from "next/navigation"
 
-export function TeamSwitcher() {
+export function ProjectSwitcher() {
+  const router = useRouter()
     var teams = [
         {
             name: "Acme Inc",
@@ -78,7 +80,9 @@ export function TeamSwitcher() {
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem className="gap-2 p-2" onClick={() => {
+              router.push("/createProject");
+            }}>
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
