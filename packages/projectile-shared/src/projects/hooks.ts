@@ -60,7 +60,7 @@ export function getProjectsApiUrl({ apiUrl }: { sessionId?: string; apiUrl?: str
 
     return (
         runtimeGlobal.process?.env?.EXPO_PUBLIC_API_URL ??
-        runtimeGlobal.process?.env?.API_URL ??
+        runtimeGlobal.process?.env?.NEXT_PUBLIC_API_URL ??
         DEFAULT_API_URL
     ).replace(/\/+$/, "");
 }

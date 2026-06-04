@@ -4,8 +4,14 @@ import { Item, ItemGroup, ItemHeader, ItemTitle, ItemDescription, ItemContent, I
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PlusCircleIcon, PlusIcon, XIcon } from "lucide-react";
+import { useCreateProject } from "@projectile/shared";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CreateProjectPage() {
+  const [projectName, setProjectName] = useState("New Project");
+  const { createProject: submitProject, creating, error } = useCreateProject({});
+  const router = useRouter();
   return (
     <>
       <div className="flex w-[50%]">
@@ -19,12 +25,16 @@ export default function CreateProjectPage() {
                 <ItemDescription>Enter a name for your project</ItemDescription>
               </ItemContent>
               <ItemFooter>
-                <Input placeholder="Project Name" />
+                <Input placeholder="Project Name" value={projectName} onChange={(e) => setProjectName(e.target.value)} />
               </ItemFooter>
             </Item>
           </ItemGroup>
           <div className="flex flex-row gap-2 mt-5">
-            <Button><PlusIcon />Create</Button>
+            <Button disabled={creating} onClick={() => {
+              creating ? null : submitProject({ name: projectName }).then(() => {
+                router.push("/app");
+              });
+            }}><PlusIcon />{creating ? "Creating..." : "Create"}</Button>
             <Button variant="outline"><XIcon />Cancel</Button>
           </div>
         </div>

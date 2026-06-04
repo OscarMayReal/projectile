@@ -1,8 +1,11 @@
-import { Command, ListIcon, SearchIcon, SettingsIcon } from "lucide-react"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenuButton, SidebarProvider, SidebarRail } from "@/components/ui/sidebar"
+"use client"
+import { Command, ListIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenuButton, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
 import { AuthManager } from "@/components/auth/authManager"
 import { UserItem } from "@/components/auth/userItem"
 import { ProjectSwitcher } from "@/components/app/project-switcher"
+import { Button } from "@/components/ui/button"
+import { useSidebar } from "@/components/ui/sidebar"
 
 export default function AppLayout({
   children,
@@ -11,14 +14,14 @@ export default function AppLayout({
 }) {
   return (
     <AuthManager>
-        <SidebarProvider className="bg-white">
+        <SidebarProvider
+            className="bg-white"
+        >
             <Sidebar 
                 collapsible="icon" 
-                // variant={"floating"}
+                variant={"inset"}
             >
-                <SidebarHeader>
-                    <ProjectSwitcher />
-                </SidebarHeader>
+                <SidebarHeaderSection />
                 <SidebarContent>
                     <SidebarGroup className="pt-0">
                         <SidebarGroupLabel>Menu</SidebarGroupLabel>
@@ -51,4 +54,18 @@ export default function AppLayout({
         </SidebarProvider>
     </AuthManager>
   )
+}
+
+export function SidebarHeaderSection() {
+    const sb = useSidebar()
+    return (
+        <SidebarHeader>
+            <div className="flex flex-row w-full">
+                <ProjectSwitcher visible={sb.state === "expanded"} />
+                {sb.state === "expanded" && <div className="flex-1" />}
+                <SidebarTrigger size={"icon"} />
+            </div>
+            <Button variant={"outline"}><PlusIcon />{sb.state === "expanded" ? "Create" : ""}</Button>
+        </SidebarHeader>
+    )
 }

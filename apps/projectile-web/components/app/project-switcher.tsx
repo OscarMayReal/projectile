@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronDown, Command, Plus } from "lucide-react"
+import { ChevronDown, Command, Plus, UsersIcon } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -16,44 +16,48 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
+import { useProjects } from "@projectile/shared"
+import { useEffect } from "react"
 
-export function ProjectSwitcher() {
+export function ProjectSwitcher({visible = true}) {
   const router = useRouter()
-    var teams = [
-        {
-            name: "Acme Inc",
-            logo: Command,
-            plan: "Enterprise",
-        },
-        {
-            name: "Acme Corp.",
-            logo: Command,
-            plan: "Startup",
-        },
-        {
-            name: "X Corp.",
-            logo: Command,
-            plan: "Free",
-        },
-    ]
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const sidebar = useSidebar()
+  const { projects } = useProjects({})
+  
+  const [activeTeam, setActiveTeam] = React.useState<any>(undefined)
+  useEffect(() => {
+    setActiveTeam(window?.localStorage?.getItem('activeProjectId') ? window.localStorage.getItem('activeProjectId') : undefined)
+  }, [])
+  useEffect(() => {
+    window.localStorage.setItem('activeProjectId', activeTeam)
+  }, [activeTeam])
 
-  if (!activeTeam) {
-    return null
+  useEffect(() => {
+    if (projects.loaded && projects.data.length == 0) {
+      router.push('/createProject')
+    }
+    if ((!activeTeam || activeTeam === 'undefined') && projects.data && projects.data.length > 0) {
+      setActiveTeam(projects.data[0].id)
+    }
+  }, [projects, activeTeam])
+
+  if (!activeTeam || !projects.loaded) {
+    return <div className="h-[32px]" />
   }
 
   return (
-    <SidebarMenu>
+    <SidebarMenu className={visible ? "" : "hidden"}>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton className="w-fit px-1.5">
               <div className="flex aspect-square size-5 items-center justify-center rounded-sm bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeTeam.logo className="size-3" />
+                <UsersIcon className="size-3" />
               </div>
-              <span className="truncate font-medium">{activeTeam.name}</span>
+              <span className="truncate font-medium">{projects.data?.find((project) => project.id === activeTeam)?.name}</span>
               <ChevronDown className="opacity-50" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
@@ -64,18 +68,18 @@ export function ProjectSwitcher() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Teams
+              Projects
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {projects.data?.map((project, index) => (
               <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
+                key={project.id}
+                onClick={() => setActiveTeam(project.id)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-4 shrink-0" />
+                  <UsersIcon className="size-4 shrink-0" />
                 </div>
-                {team.name}
+                {project.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
@@ -86,7 +90,7 @@ export function ProjectSwitcher() {
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
+              <div className="font-medium text-muted-foreground">Add project</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
