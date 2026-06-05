@@ -1,7 +1,7 @@
 "use client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "../ui/item";
-import { UserIcon } from "lucide-react";
+import { UserIcon, SettingsIcon, LogOutIcon } from "lucide-react";
 import { SidebarMenuButton } from "../ui/sidebar";
 import { useAuth } from "./authManager";
 
@@ -24,9 +24,9 @@ export function UserItem() {
                 </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem><UserIcon />Profile</DropdownMenuItem>
+                <DropdownMenuItem><SettingsIcon />Settings</DropdownMenuItem>
+                <DropdownMenuItem><LogOutIcon />Logout</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

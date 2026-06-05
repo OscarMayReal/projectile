@@ -3,9 +3,11 @@ import { BugIcon, ClockIcon, Command, KanbanIcon, ListIcon, PlusIcon, SearchIcon
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenuButton, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
 import { AuthManager } from "@/components/auth/authManager"
 import { UserItem } from "@/components/auth/userItem"
-import { ProjectSwitcher } from "@/components/app/project-switcher"
+import { ProjectContextProvider, ProjectSwitcher } from "@/components/app/project-switcher"
 import { Button } from "@/components/ui/button"
 import { useSidebar } from "@/components/ui/sidebar"
+import { useProjects } from "@projectile/shared"
+import { SidebarBoardsSection } from "@/components/app/sidebar-boards-section"
 
 export default function AppLayout({
   children,
@@ -14,78 +16,64 @@ export default function AppLayout({
 }) {
   return (
     <AuthManager>
-        <SidebarProvider
-            className="bg-white"
-        >
-            <Sidebar 
-                collapsible="icon" 
-                variant={"inset"}
+        <ProjectContextProvider>
+            <SidebarProvider
+                className="bg-white"
             >
-                <SidebarHeaderSection />
-                <SidebarContent>
-                    <SidebarGroup>
-                        {/* <SidebarGroupLabel>Menu</SidebarGroupLabel> */}
-                        <SidebarGroupContent>
-                            <SidebarMenuButton className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
-                                <ListIcon />
-                                Feed
-                            </SidebarMenuButton>
-                            <SidebarMenuButton>
-                                <SearchIcon />
-                                Search
-                            </SidebarMenuButton>
-                            <SidebarMenuButton>
-                                <SettingsIcon />
-                                Settings
-                            </SidebarMenuButton>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                    <SidebarGroup>
-                        <SidebarGroupLabel>Boards</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenuButton>
-                                <KanbanIcon />
-                                Board 1
-                            </SidebarMenuButton>
-                            <SidebarMenuButton>
-                                <KanbanIcon />
-                                Board 2
-                            </SidebarMenuButton>
-                            <SidebarMenuButton>
-                                <KanbanIcon />
-                                Board 3
-                            </SidebarMenuButton>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                    <SidebarGroup>
-                        <SidebarGroupLabel>Feedback & updates</SidebarGroupLabel>
-                        <SidebarGroupContent>
-                            <SidebarMenuButton>
-                                <BugIcon />
-                                Bug reports
-                            </SidebarMenuButton>
-                            <SidebarMenuButton>
-                                <SparklesIcon />
-                                Feature requests
-                            </SidebarMenuButton>
-                            <SidebarMenuButton>
-                                <ClockIcon />
-                                Changelog
-                            </SidebarMenuButton>
-                        </SidebarGroupContent>
-                    </SidebarGroup>
-                </SidebarContent>
-                <SidebarFooter>
-                    <UserItem />
-                </SidebarFooter>
-                {/* <SidebarRail /> */}
-            </Sidebar>
-            <SidebarInset className="flex-1" style={{ marginLeft: 0, borderRadius: "8px" }}>
-                <main className="flex-1">
-                    {children}
-                </main>
-            </SidebarInset>
-        </SidebarProvider>
+                <Sidebar 
+                    collapsible="icon" 
+                    variant={"inset"}
+                >
+                    <SidebarHeaderSection />
+                    <SidebarContent>
+                        <SidebarGroup>
+                            {/* <SidebarGroupLabel>Menu</SidebarGroupLabel> */}
+                            <SidebarGroupContent>
+                                <SidebarMenuButton tooltip="Feed" className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
+                                    <ListIcon />
+                                    Feed
+                                </SidebarMenuButton>
+                                <SidebarMenuButton tooltip="Search">
+                                    <SearchIcon />
+                                    Search
+                                </SidebarMenuButton>
+                                <SidebarMenuButton tooltip="Settings">
+                                    <SettingsIcon />
+                                    Settings
+                                </SidebarMenuButton>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+                       <SidebarBoardsSection />
+                        <SidebarGroup>
+                            <SidebarGroupLabel>Feedback & updates</SidebarGroupLabel>
+                            <SidebarGroupContent>
+                                <SidebarMenuButton tooltip="Bug reports">
+                                    <BugIcon />
+                                    Bug reports
+                                </SidebarMenuButton>
+                                <SidebarMenuButton tooltip="Feature requests">
+                                    <SparklesIcon />
+                                    Feature requests
+                                </SidebarMenuButton>
+                                <SidebarMenuButton tooltip="Changelog">
+                                    <ClockIcon />
+                                    Changelog
+                                </SidebarMenuButton>
+                            </SidebarGroupContent>
+                        </SidebarGroup>
+                    </SidebarContent>
+                    <SidebarFooter>
+                        <UserItem />
+                    </SidebarFooter>
+                    {/* <SidebarRail /> */}
+                </Sidebar>
+                <SidebarInset className="flex-1" style={{ marginLeft: 0, borderRadius: "8px" }}>
+                    <main className="flex-1">
+                        {children}
+                    </main>
+                </SidebarInset>
+            </SidebarProvider>
+        </ProjectContextProvider>
     </AuthManager>
   )
 }
