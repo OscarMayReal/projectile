@@ -45,6 +45,14 @@ export async function getProjectById(projectId: string) {
     where: {
       id: projectId,
     },
+    include: {
+      permissions: {
+        include: {
+          user: true,
+        }
+      },
+      boards: true,
+    },
   });
   return project;
 }

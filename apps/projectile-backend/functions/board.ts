@@ -51,3 +51,33 @@ export async function createBoard({
   });
   return project;
 }
+
+export async function getBoardsByProjectId(projectId: string) {
+  const boards = await prisma.board.findMany({
+    where: {
+      projectId,
+    },
+  });
+  return boards;
+}
+
+export async function getBoardById(boardId: string) {
+  const board = await prisma.board.findUnique({
+    where: {
+      id: boardId,
+    },
+    include: {
+      states: true,
+      project: {
+        include: {
+          permissions: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  return board;
+}
