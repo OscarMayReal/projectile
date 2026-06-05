@@ -1,12 +1,12 @@
 import { Host, Text } from "@expo/ui";
 import { Stack } from "expo-router";
 
-export default function Feed() {
+export default function Boards() {
   return (
     <>
-      <Stack.Screen options={{ title: "Feed" }} />
+      <Stack.Screen options={{title: "Boards"}} />
       <Host>
-        <Text>Feed</Text>
+        <Text>boards</Text>
       </Host>
     </>
   );
