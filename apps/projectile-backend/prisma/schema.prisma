@@ -21,6 +21,9 @@ model User {
   accountConnectionType AccountConnectionType @default(KeyStone)
   projectPermissions    ProjectPermission[]
   createdBoards         Board[] @relation("BoardToCreator")
+  assignedTasks         AssignedTask[] @relation("UserToAssigned")
+  comments              TaskComment[] @relation("UserToComment")
+  createdTasks          Task[] @relation("TaskToCreator")
   @@unique([userConnectionId, accountConnectionType])
 }
 
@@ -64,6 +67,40 @@ model State {
   updatedAt DateTime @updatedAt
   type StateType @default(Open)
   color String @default("#6b7280")
+  tasks Task[] @relation("StateToTask")
+}
+
+model Task {
+  id String @id @default(uuid())
+  stateId String
+  state State @relation(fields: [stateId], references: [id], name: "StateToTask")
+  name String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  assignedTasks AssignedTask[] @relation("TaskToAssigned")
+  comments TaskComment[] @relation("TaskToComment")
+  createdBy String
+  creatorUser User @relation(fields: [createdBy], references: [id], name: "TaskToCreator")
+}
+
+model TaskComment {
+  id String @id @default(uuid())
+  taskId String
+  task Task @relation(fields: [taskId], references: [id], name: "TaskToComment")
+  userId String
+  user User @relation(fields: [userId], references: [id], name: "UserToComment")
+  content String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AssignedTask {
+  id String @id @default(uuid())
+  taskId String
+  task Task @relation(fields: [taskId], references: [id], name: "TaskToAssigned")
+  userId String
+  user User @relation(fields: [userId], references: [id], name: "UserToAssigned")
 }
 
 enum AccountConnectionType {
@@ -85,6 +122,3 @@ enum StateType {
   Done
   Closed
 }
-
-
-

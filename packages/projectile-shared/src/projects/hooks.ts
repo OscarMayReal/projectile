@@ -1,19 +1,112 @@
 import { useCallback, useEffect, useState } from "react";
 
+export type AccountConnectionType = "KeyStone";
+
+export type ProjectPermissionLevel = "Read" | "Member" | "Admin";
+
+export type StateType =
+    | "PreOpen"
+    | "Open"
+    | "Blocked"
+    | "InProgress"
+    | "Ready"
+    | "Done"
+    | "Closed";
+
+export type UserRecord = {
+    id: string;
+    email: string;
+    name: string;
+    userConnectionId: string;
+    accountConnectionType: AccountConnectionType;
+    [key: string]: unknown;
+};
+
 export type Project = {
     id: string;
     name: string;
-    boards?: Board[];
-    permissions?: Array<Record<string, unknown>>;
     [key: string]: unknown;
 };
 
 export type Board = {
+    iconName: string | null;
+    color: string | null;
     id: string;
     name: string;
+    createdAt: string;
+    updatedAt: string;
     description: string | null;
+    createdBy: string;
     projectId: string;
     [key: string]: unknown;
+};
+
+export type ProjectPermission = {
+    id: string;
+    userId: string;
+    projectId: string;
+    permissionLevel: ProjectPermissionLevel;
+    user: UserRecord;
+    [key: string]: unknown;
+};
+
+export type ProjectDetail = Project & {
+    permissions: ProjectPermission[];
+    boards: Board[];
+};
+
+export type ProjectWithPermissions = Project & {
+    permissions: ProjectPermission[];
+};
+
+export type AssignedTask = {
+    id: string;
+    taskId: string;
+    userId: string;
+    user: UserRecord;
+    [key: string]: unknown;
+};
+
+export type TaskComment = {
+    id: string;
+    taskId: string;
+    userId: string;
+    user: UserRecord;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    [key: string]: unknown;
+};
+
+export type Task = {
+    id: string;
+    stateId: string;
+    name: string;
+    description: string | null;
+    createdAt: string;
+    updatedAt: string;
+    createdBy: string;
+    creatorUser: UserRecord;
+    assignedTasks: AssignedTask[];
+    comments: TaskComment[];
+    [key: string]: unknown;
+};
+
+export type State = {
+    id: string;
+    boardId: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+    type: StateType;
+    color: string;
+    tasks: Task[];
+    [key: string]: unknown;
+};
+
+export type BoardDetail = Board & {
+    states: State[];
+    project: ProjectWithPermissions;
 };
 
 export type UseProjectsState = {
@@ -59,7 +152,14 @@ export type UseCreateBoardState = {
 export type UseProjectState = {
     loaded: boolean;
     loading: boolean;
-    data: Project | null;
+    data: ProjectDetail | null;
+    error: string | null;
+};
+
+export type UseBoardState = {
+    loaded: boolean;
+    loading: boolean;
+    data: BoardDetail | null;
     error: string | null;
 };
 
@@ -237,19 +337,14 @@ export async function getProjectById(
         throw new Error(`Failed to load project: ${response.status}`);
     }
 
-    return (await response.json()) as Project;
+    return (await response.json()) as ProjectDetail;
 }
 
 export function useProjectById(
     projectId: string,
     options: UseProjectOptions = {},
 ) {
-    const [project, setProject] = useState<{
-        loaded: boolean;
-        loading: boolean;
-        data: Project | null;
-        error: string | null;
-    }>({
+    const [project, setProject] = useState<UseProjectState>({
         loaded: false,
         loading: false,
         data: null,
@@ -428,7 +523,7 @@ export async function createBoard(
         throw new Error(`Failed to create board: ${response.status}`);
     }
 
-    return (await response.json()) as Board;
+    return (await response.json()) as BoardDetail;
 }
 
 export function useCreateBoard(options: CreateBoardOptions = {}) {
@@ -515,7 +610,7 @@ export async function getBoardById(
         throw new Error(`Failed to load board: ${response.status}`);
     }
 
-    return (await response.json()) as Board;
+    return (await response.json()) as BoardDetail;
 }
 
 export function useBoardById(
@@ -523,12 +618,7 @@ export function useBoardById(
     boardId: string,
     options: UseBoardOptions = {},
 ) {
-    const [board, setBoard] = useState<{
-        loaded: boolean;
-        loading: boolean;
-        data: Board | null;
-        error: string | null;
-    }>({
+    const [board, setBoard] = useState<UseBoardState>({
         loaded: false,
         loading: false,
         data: null,

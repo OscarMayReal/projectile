@@ -2,8 +2,24 @@ export { useDebouncedValue } from "./hooks/use-debounced-value";
 export { useIsMounted } from "./hooks/use-is-mounted";
 export { useLatest } from "./hooks/use-latest";
 export { useStableCallback } from "./hooks/use-stable-callback";
-export type { Board } from "./projects";
-export type { UseProjectState } from "./projects";
+export type {
+    AccountConnectionType,
+    AssignedTask,
+    Board,
+    BoardDetail,
+    Project,
+    ProjectDetail,
+    ProjectPermission,
+    ProjectPermissionLevel,
+    ProjectWithPermissions,
+    State,
+    StateType,
+    Task,
+    TaskComment,
+    UseBoardState,
+    UseProjectState,
+    UserRecord,
+} from "./projects";
 export {
     createBoard,
     createProject,

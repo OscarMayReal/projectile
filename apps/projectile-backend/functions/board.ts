@@ -67,7 +67,25 @@ export async function getBoardById(boardId: string) {
       id: boardId,
     },
     include: {
-      states: true,
+      states: {
+        include: {
+          tasks: {
+            include: {
+              assignedTasks: {
+                include: {
+                  user: true,
+                },
+              },
+              comments: {
+                include: {
+                  user: true,
+                },
+              },
+              creatorUser: true,
+            },
+          },
+        },
+      },
       project: {
         include: {
           permissions: {
