@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/button"
 import { useSidebar } from "@/components/ui/sidebar"
 import { useProjects } from "@projectile/shared"
 import { SidebarBoardsSection } from "@/components/app/sidebar-boards-section"
+import { SidebarItem } from "@/components/app/sidebar-item"
+import { useRouter } from "next/navigation"
 
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+    const router = useRouter()
   return (
     <AuthManager>
         <ProjectContextProvider>
@@ -29,18 +32,9 @@ export default function AppLayout({
                         <SidebarGroup>
                             {/* <SidebarGroupLabel>Menu</SidebarGroupLabel> */}
                             <SidebarGroupContent>
-                                <SidebarMenuButton tooltip="Feed" className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground">
-                                    <ListIcon />
-                                    Feed
-                                </SidebarMenuButton>
-                                <SidebarMenuButton tooltip="Search">
-                                    <SearchIcon />
-                                    Search
-                                </SidebarMenuButton>
-                                <SidebarMenuButton tooltip="Settings">
-                                    <SettingsIcon />
-                                    Settings
-                                </SidebarMenuButton>
+                                <SidebarItem Icon={ListIcon} label="Feed" location={{mode: "equals", path: "/app"}} onClick={() => router.push("/app")} />
+                                <SidebarItem Icon={SearchIcon} label="Search" location={{mode: "includes", path: "/app/search"}} onClick={() => router.push("/app/search")} />
+                                <SidebarItem Icon={SettingsIcon} label="Settings" location={{mode: "includes", path: "/app/settings"}} onClick={() => router.push("/app/settings")} />
                             </SidebarGroupContent>
                         </SidebarGroup>
                        <SidebarBoardsSection />
@@ -78,7 +72,7 @@ export default function AppLayout({
   )
 }
 
-export function SidebarHeaderSection() {
+function SidebarHeaderSection() {
     const sb = useSidebar()
     return (
         <SidebarHeader>

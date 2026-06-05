@@ -9,8 +9,12 @@ import { Input } from "../ui/input"
 import { Separator } from "../ui/separator"
 import { createBoard, createProject } from "@projectile/shared"
 import { useSidebar } from "../ui/sidebar"
+import { useRouter } from "next/navigation"
+import router from "next/router"
+import { SidebarItem } from "./sidebar-item"
 
 export function SidebarBoardsSection() {
+    const router = useRouter()
     const [createBoardOpen, setCreateBoardOpen] = useState(false)
     const { activeProjectState } = useProjectContext()
     const { state } = useSidebar()
@@ -22,10 +26,7 @@ export function SidebarBoardsSection() {
             </SidebarGroupAction>}
             <SidebarGroupContent>
                 {activeProjectState?.data?.boards?.map((board) => (
-                    <SidebarMenuButton tooltip={board.name} key={board.id}>
-                        <KanbanIcon />
-                        {board.name}
-                    </SidebarMenuButton>
+                    <SidebarItem key={board.id} Icon={KanbanIcon} label={board.name} location={{mode: "includes", path: `/app/board/${board.id}`}} onClick={() => router.push(`/app/board/${board.id}`)} />
                 ))}
             </SidebarGroupContent>
             <CreateBoardDialog open={createBoardOpen} onOpenChange={setCreateBoardOpen} />
@@ -59,6 +60,7 @@ export function CreateBoardDialog({open, onOpenChange}: {open: boolean, onOpenCh
                         await createBoard({ name, projectId: activeProjectState?.data?.id || "", description })
                         onOpenChange(false)
                         reloadProject()
+                        router.push(`/app/project/${activeProjectState?.data?.id}`)
                     }}><PlusIcon />Create</Button>
                 </DialogFooter>
             </DialogContent>
