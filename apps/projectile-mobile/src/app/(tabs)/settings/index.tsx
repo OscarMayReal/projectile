@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Image as ExpoImage } from "expo-image";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Platform } from "react-native";
+import { ToolbarProjectSwitcher } from "@/components/toolbar-project-switcher";
 
 const userIcon = Icon.select({
   ios: "person",
@@ -21,6 +22,7 @@ export default function Settings() {
   return (
     <>
       <Stack.Screen options={{ title: "Settings" }} />
+      <ToolbarProjectSwitcher />
       <Host style={{ flex: 1 }}>
         <FieldGroup>
           <FieldGroup.Section>

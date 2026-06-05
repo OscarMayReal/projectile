@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import person_2 from "@expo/material-symbols/person_2.xml"
+import group from "@expo/material-symbols/group.xml"
 import React, { createContext, useContext, useEffect } from "react";
 import { useProjectById, useProjects } from "@projectile/shared"
 import { UseProjectsState, UseProjectState } from "../../../../packages/projectile-shared/src/projects/hooks";
@@ -7,10 +7,10 @@ import { useAuth } from "./auth/auth-provider";
 
 export function ToolbarProjectSwitcher() {
     const {projects, activeProject, setActiveProject} = useProjectContext()
-    return <Stack.Toolbar placement="left">
-        <Stack.Toolbar.Menu title={projects.data.find(project => project.id == activeProject)?.name}>
+    return <Stack.Toolbar placement={process.env.EXPO_OS === 'ios' ? "right" : "right"}>
+        <Stack.Toolbar.Menu icon={process.env.EXPO_OS == "ios" ? undefined : group} title={projects.data.find(project => project.id == activeProject)?.name}>
             {projects.data.map((project) => (
-                <Stack.Toolbar.MenuAction key={project.id} onPress={() => setActiveProject(project.id)} icon={process.env.EXPO_OS === 'ios' ? "person.2" : person_2}>
+                <Stack.Toolbar.MenuAction key={project.id} onPress={() => setActiveProject(project.id)} icon={process.env.EXPO_OS === 'ios' ? "person.2" : group}>
                     {project.name}
                 </Stack.Toolbar.MenuAction>
             ))}
@@ -24,12 +24,17 @@ export const ProjectContextProvider = ({ children }: { children: React.ReactNode
     const auth = useAuth()
     const {projects} = useProjects({sessionId: auth.sessionId})
     const [activeProject, setActiveProject] = React.useState<any>(undefined)
-    const {project, reload: reloadProject} = useProjectById(activeProject)
+    const {project, reload: reloadProject} = useProjectById(activeProject, {sessionId: auth.sessionId})
     useEffect(() => {
         if (projects.data.length > 0 && !activeProject) {
             setActiveProject(projects.data[0].id)
         }
     }, [projects.data, activeProject])
+    // useEffect(() => {
+    //     console.log(activeProject)
+    //     reloadProject()
+    //     console.log(project)
+    // }, [activeProject])
     return (
         <projectContext.Provider value={{ projects: projects, activeProject: activeProject, setActiveProject: setActiveProject, activeProjectState: project, reloadProject }}>
             {children}
