@@ -149,6 +149,37 @@ export type UseCreateBoardState = {
     error: string | null;
 };
 
+export type CreateTaskInput = {
+    projectId: string;
+    boardId: string;
+    stateId: string;
+    name: string;
+    description: string;
+};
+
+export type CreateTaskOptions = UseProjectsOptions;
+
+export type UseCreateTaskState = {
+    creating: boolean;
+    error: string | null;
+};
+
+export type UpdateTaskInput = {
+    projectId: string;
+    boardId: string;
+    stateId: string;
+    taskId: string;
+    name: string;
+    description: string;
+};
+
+export type UpdateTaskOptions = UseProjectsOptions;
+
+export type UseUpdateTaskState = {
+    updating: boolean;
+    error: string | null;
+};
+
 export type UseProjectState = {
     loaded: boolean;
     loading: boolean;
@@ -681,5 +712,203 @@ export function useBoardById(
     return {
         board,
         reload,
+    };
+}
+
+export async function createTask(
+    input: CreateTaskInput,
+    options: CreateTaskOptions = {},
+) {
+    const sessionId = normalizeSessionId(
+        options.sessionId ?? getSessionIdFromCookie(),
+    );
+
+    if (!sessionId) {
+        throw new Error("Missing sessionId");
+    }
+
+    if (!input.projectId?.trim()) {
+        throw new Error("Missing projectId");
+    }
+
+    if (!input.boardId?.trim()) {
+        throw new Error("Missing boardId");
+    }
+
+    if (!input.stateId?.trim()) {
+        throw new Error("Missing stateId");
+    }
+
+    const apiUrl = getProjectsApiUrl({ apiUrl: options.apiUrl });
+    const requestUrl = buildEndpointUrl(
+        apiUrl,
+        `/project/p/${input.projectId}/b/${input.boardId}/s/${input.stateId}/tasks/create`,
+    );
+    const body: Record<string, string> = {
+        name: input.name,
+        description: input.description,
+    };
+
+    if (typeof document === "undefined") {
+        body.sessionId = sessionId;
+    }
+
+    const response = await fetch(requestUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: typeof document !== "undefined" ? "include" : "omit",
+        body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to create task: ${response.status}`);
+    }
+
+    return (await response.json()) as Task;
+}
+
+export function useCreateTask(options: CreateTaskOptions = {}) {
+    const [state, setState] = useState<UseCreateTaskState>({
+        creating: false,
+        error: null,
+    });
+
+    const submit = useCallback(
+        async (input: CreateTaskInput) => {
+            setState({
+                creating: true,
+                error: null,
+            });
+
+            try {
+                const task = await createTask(input, options);
+
+                setState({
+                    creating: false,
+                    error: null,
+                });
+
+                return task;
+            } catch (error) {
+                const message =
+                    error instanceof Error ? error.message : "Failed to create task";
+
+                setState({
+                    creating: false,
+                    error: message,
+                });
+
+                throw error;
+            }
+        },
+        [options.apiUrl, options.sessionId],
+    );
+
+    return {
+        ...state,
+        createTask: submit,
+    };
+}
+
+export async function updateTask(
+    input: UpdateTaskInput,
+    options: UpdateTaskOptions = {},
+) {
+    const sessionId = normalizeSessionId(
+        options.sessionId ?? getSessionIdFromCookie(),
+    );
+
+    if (!sessionId) {
+        throw new Error("Missing sessionId");
+    }
+
+    if (!input.projectId?.trim()) {
+        throw new Error("Missing projectId");
+    }
+
+    if (!input.boardId?.trim()) {
+        throw new Error("Missing boardId");
+    }
+
+    if (!input.stateId?.trim()) {
+        throw new Error("Missing stateId");
+    }
+
+    if (!input.taskId?.trim()) {
+        throw new Error("Missing taskId");
+    }
+
+    const apiUrl = getProjectsApiUrl({ apiUrl: options.apiUrl });
+    const requestUrl = buildEndpointUrl(
+        apiUrl,
+        `/project/p/${input.projectId}/b/${input.boardId}/s/${input.stateId}/tasks/${input.taskId}/update`,
+    );
+    const body: Record<string, string> = {
+        name: input.name,
+        description: input.description,
+    };
+
+    if (typeof document === "undefined") {
+        body.sessionId = sessionId;
+    }
+
+    const response = await fetch(requestUrl, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: typeof document !== "undefined" ? "include" : "omit",
+        body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to update task: ${response.status}`);
+    }
+
+    return (await response.json()) as Task;
+}
+
+export function useUpdateTask(options: UpdateTaskOptions = {}) {
+    const [state, setState] = useState<UseUpdateTaskState>({
+        updating: false,
+        error: null,
+    });
+
+    const submit = useCallback(
+        async (input: UpdateTaskInput) => {
+            setState({
+                updating: true,
+                error: null,
+            });
+
+            try {
+                const task = await updateTask(input, options);
+
+                setState({
+                    updating: false,
+                    error: null,
+                });
+
+                return task;
+            } catch (error) {
+                const message =
+                    error instanceof Error ? error.message : "Failed to update task";
+
+                setState({
+                    updating: false,
+                    error: message,
+                });
+
+                throw error;
+            }
+        },
+        [options.apiUrl, options.sessionId],
+    );
+
+    return {
+        ...state,
+        updateTask: submit,
     };
 }

@@ -7,6 +7,7 @@ export type {
     AssignedTask,
     Board,
     BoardDetail,
+    CreateTaskInput,
     Project,
     ProjectDetail,
     ProjectPermission,
@@ -16,13 +17,17 @@ export type {
     StateType,
     Task,
     TaskComment,
+    UpdateTaskInput,
     UseBoardState,
+    UseCreateTaskState,
     UseProjectState,
+    UseUpdateTaskState,
     UserRecord,
 } from "./projects";
 export {
     createBoard,
     createProject,
+    createTask,
     getBoardById,
     getProjectById,
     getProjectsApiUrl,
@@ -30,8 +35,11 @@ export {
     useBoardById,
     useCreateBoard,
     useCreateProject,
+    useCreateTask,
     useProjectById,
     useProjects,
+    useUpdateTask,
+    updateTask,
 } from "./projects";
 
 export { clamp } from "./utils/clamp";
