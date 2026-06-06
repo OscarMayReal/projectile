@@ -3,7 +3,7 @@ import { AccountConnectionType, PrismaClient } from "../generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg";
 import { getVerifiedSessionFromRequest } from "../functions/session";
 import { createProject, getProjectById, getProjectsByUserId } from "../functions/project";
-import { createBoard, getBoardById } from "../functions/board";
+import { createBoard, createTask, getBoardById, updateTask } from "../functions/board";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg(process.env.DATABASE_URL!),
@@ -95,6 +95,57 @@ router.get("/p/:projectid/b/:boardid/get", async (req, res) => {
     if (project && project.permissions.some((permission) => permission.userId === user?.id)) {
         const board = await getBoardById(req.params.boardid)
         res.json(board);
+    } else {
+        res.status(403).json({ error: "Forbidden" })
+    }
+});
+
+router.post("/p/:projectid/b/:boardid/s/:stateid/tasks/create", async (req, res) => {
+    const { name, description } = req.body;
+    const { session } = await getVerifiedSessionFromRequest(req);
+    const user = await prisma.user.findUnique({
+        where: {
+            userConnectionId_accountConnectionType: {
+                userConnectionId: session.user.id,
+                accountConnectionType: AccountConnectionType.KeyStone,
+            },
+        },
+    })
+    const project = await getProjectById(req.params.projectid)
+    if (project && project.permissions.some((permission) => permission.userId === user?.id)) {
+        const task = await createTask({
+            boardId: req.params.boardid,
+            name,
+            description,
+            stateId: req.params.stateid,
+            createdBy: user!.id,
+        })
+        res.json(task);
+    } else {
+        res.status(403).json({ error: "Forbidden" })
+    }
+});
+
+router.put("/p/:projectid/b/:boardid/s/:stateid/tasks/:taskid/update", async (req, res) => {
+    const { name, description } = req.body;
+    const { session } = await getVerifiedSessionFromRequest(req);
+    const user = await prisma.user.findUnique({
+        where: {
+            userConnectionId_accountConnectionType: {
+                userConnectionId: session.user.id,
+                accountConnectionType: AccountConnectionType.KeyStone,
+            },
+        },
+    })
+    const project = await getProjectById(req.params.projectid)
+    if (project && project.permissions.some((permission) => permission.userId === user?.id)) {
+        const task = await updateTask({
+            taskId: req.params.taskid,
+            name,
+            description,
+            stateId: req.params.stateid,
+        })
+        res.json(task);
     } else {
         res.status(403).json({ error: "Forbidden" })
     }

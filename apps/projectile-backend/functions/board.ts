@@ -1,3 +1,4 @@
+import { name } from "node:assert";
 import { PrismaClient, StateType } from "../generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -98,4 +99,84 @@ export async function getBoardById(boardId: string) {
     },
   });
   return board;
+}
+
+export async function createTask({
+  boardId,
+  name,
+  description,
+  stateId,
+  createdBy,
+}: {
+  boardId: string;
+  name: string;
+  description: string;
+  stateId: string;
+  createdBy: string;
+}) {
+  const board = await prisma.board.findUnique({
+    where: {
+      id: boardId,
+    },
+    include: {
+      states: true
+    }
+  });
+  if (!board) {
+    throw new Error("Board not found");
+  }
+  if (!stateId) {
+    stateId = board.states.find((state) => state.type === StateType.Open)?.id;
+  }
+  const task = await prisma.task.create({
+      data: {
+          name,
+          description,
+          board: {
+            connect: {
+              id: boardId,
+            },
+          },
+          state: {
+            connect: {
+              id: stateId,
+            },
+          },
+          creatorUser: {
+            connect: {
+              id: createdBy,
+            },
+          },
+
+      },
+  });
+  return task;
+}
+
+export async function updateTask({
+  taskId,
+  name,
+  description,
+  stateId,
+}: {
+  taskId: string;
+  name?: string;
+  description?: string;
+  stateId?: string;
+}) {
+    const task = await prisma.task.update({
+        where: {
+            id: taskId,
+        },
+        data: {
+            name,
+            description,
+            state: {
+                connect: {
+                    id: stateId,
+                },
+            },
+        },
+    });
+    return task;
 }

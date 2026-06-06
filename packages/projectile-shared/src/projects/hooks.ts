@@ -313,7 +313,7 @@ export async function getProjectById(
         throw new Error("Missing sessionId");
     }
 
-    if (!projectId.trim()) {
+    if (!projectId?.trim()) {
         throw new Error("Missing projectId");
     }
 
@@ -352,7 +352,7 @@ export function useProjectById(
     });
 
     const reload = useCallback(async () => {
-        const normalizedProjectId = projectId.trim();
+        const normalizedProjectId = projectId?.trim();
 
         if (!normalizedProjectId) {
             setProject({
@@ -492,7 +492,7 @@ export async function createBoard(
         throw new Error("Missing sessionId");
     }
 
-    if (!input.projectId.trim()) {
+    if (!input.projectId?.trim()) {
         throw new Error("Missing projectId");
     }
 
@@ -582,11 +582,11 @@ export async function getBoardById(
         throw new Error("Missing sessionId");
     }
 
-    if (!projectId.trim()) {
+    if (!projectId?.trim()) {
         throw new Error("Missing projectId");
     }
 
-    if (!boardId.trim()) {
+    if (!boardId?.trim()) {
         throw new Error("Missing boardId");
     }
 
@@ -626,8 +626,8 @@ export function useBoardById(
     });
 
     const reload = useCallback(async () => {
-        const normalizedProjectId = projectId.trim();
-        const normalizedBoardId = boardId.trim();
+        const normalizedProjectId = projectId?.trim();
+        const normalizedBoardId = boardId?.trim();
 
         if (!normalizedProjectId) {
             setBoard({
