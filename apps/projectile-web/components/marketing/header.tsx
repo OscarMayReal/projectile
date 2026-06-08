@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { PlayIcon, LogInIcon } from "lucide-react"
+import { PlayIcon, LogInIcon, LayoutGridIcon } from "lucide-react"
+import Link from "next/link"
 
 export function MarketingHeader() {
     const [isScrolled, setIsScrolled] = useState(false)
@@ -19,8 +20,9 @@ export function MarketingHeader() {
                 <img src="/assets/logo.svg" alt="Projectile" className="h-7 w-7"/>
                 <h1 className="text-xl ml-3">Projectile</h1>
                 <div className="flex-1"/>
-                <Button className="mr-3"><PlayIcon />Get Started</Button>
-                <Button variant="outline"><LogInIcon />Sign In</Button>
+                {/* <Button className="mr-3"><PlayIcon />Get Started</Button>
+                <Button variant="outline"><LogInIcon />Sign In</Button> */}
+                <Link href="/app"><Button><LayoutGridIcon />Go to app</Button></Link>
             </div>
         </header>
     )
