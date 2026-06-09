@@ -15,7 +15,7 @@ import {
   updateTask,
   useBoardById,
 } from "@projectile/shared"
-import { PlusCircleIcon, SaveIcon } from "lucide-react"
+import { ArrowUpRightFromSquareIcon, CheckSquare, CheckSquareIcon, InfoIcon, PlusCircleIcon, SaveIcon } from "lucide-react"
 import { Usable, use, useMemo, useState } from "react"
 import {
   Dialog,
@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
+import { Item, ItemContent, ItemDescription, ItemHeader, ItemMedia, ItemTitle } from "@/components/ui/item"
 
 export default function AppPage({
   params,
@@ -170,14 +171,7 @@ function BoardTaskKanban({
                 />
               </div>
               {tasks.map((task) => (
-                <KanbanItem key={task.id} value={task.id} asHandle asChild>
-                  <div className="rounded-md border bg-card p-3 shadow-xs">
-                    <h1 className="text-lg font-semibold">{task.name}</h1>
-                    <p className="text-sm text-muted-foreground">
-                      {task.description}
-                    </p>
-                  </div>
-                </KanbanItem>
+                <TaskKanbanItem key={task.id} task={task} />
               ))}
             </KanbanColumn>
           ))}
@@ -254,5 +248,93 @@ function CreateTaskDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function TaskKanbanItem({task}: {task: Task}) {
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false)
+  return (
+    <Dialog open={taskDialogOpen} onOpenChange={setTaskDialogOpen}>
+      <DialogTrigger asChild>
+        <KanbanItem key={task.id} value={task.id} asHandle asChild>
+          <div className="rounded-md border bg-card p-3 shadow-xs">
+            <div className="flex flex-row items-center">
+              <h1 className="text-lg font-semibold">{task.name}</h1>
+              <Button size="icon-sm" variant={"ghost"} className="text-muted-foreground ml-auto" onMouseDown={(ev) => ev.stopPropagation()} onClick={(ev) => {
+                ev.stopPropagation()
+                setTaskDialogOpen(true)
+              }}>
+                <ArrowUpRightFromSquareIcon />
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {task.description}
+            </p>
+          </div>
+        </KanbanItem>
+      </DialogTrigger>
+      <DialogContent
+        style={{
+          maxWidth: "70vw",
+          width: "70vw",
+          padding: "0",
+          gap: 0,
+          height: "70vh",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <DialogHeader className="border-b p-4 h-[50px]">
+          <div className="flex flex-row items-center gap-2">
+            <CheckSquareIcon size={16} />
+            <DialogTitle>Task: {task.name}</DialogTitle>
+          </div>
+        </DialogHeader>
+        <div className="flex h-full overflow-y-auto">
+          <TaskInfoView task={task} />
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function TaskInfoView({task}: {task: Task}) {
+  return (
+    <div className="flex flex-row h-full w-full">
+      <div className="flex-1 w-full h-full">
+        <div className="w-full border-b border-border p-6">
+          <div className="flex flex-row">
+            <div className="text-2xl font-bold">
+              {task.name}
+            </div>
+          </div>
+          <div>
+            {task.description}
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="text-xl font-bold">
+            Comments
+          </div>
+        </div>
+      </div>
+      <div className="w-[300px] min-w-[300px] h-full border-l border-border p-4">
+        <Item className="border-none p-0">
+          <ItemContent>
+            <ItemTitle><InfoIcon size={16} /> Task information</ItemTitle>
+            <ItemDescription>
+              Information about the task
+            </ItemDescription>
+          </ItemContent>
+        </Item>
+        <Separator className="mt-4" />
+        <div className="mt-4 flex flex-col gap-1">
+          <div><strong>Created:</strong> {new Date(task.createdAt).toLocaleDateString()}</div>
+          <div><strong>Updated:</strong> {new Date(task.updatedAt).toLocaleDateString()}</div>
+          <div><strong>Created By:</strong> {task.creatorUser?.name ?? "Unknown"}</div>
+          <div><strong>Task ID:</strong> {task.id}</div>
+        </div>
+      </div>
+    </div>
   )
 }
