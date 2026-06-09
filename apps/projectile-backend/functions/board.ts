@@ -180,3 +180,26 @@ export async function updateTask({
     });
     return task;
 }
+
+export async function CreateComment({taskId, content, createdBy}: {taskId: string; content: string; createdBy: string}) {
+  const comment = await prisma.taskComment.create({
+    data: {
+      content,
+      task: {
+        connect: {
+          id: taskId,
+        },
+      },
+      user: {
+        connect: {
+          id: createdBy,
+        },
+      },
+    },
+    include: {
+      user: true,
+    },
+  });
+  return comment;
+    
+}

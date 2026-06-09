@@ -10,12 +10,14 @@ import {
 } from "@/components/ui/kanban"
 import {
   createTask,
+  createTaskComment,
   State,
   Task,
+  TaskComment,
   updateTask,
   useBoardById,
 } from "@projectile/shared"
-import { ArrowUpRightFromSquareIcon, CheckSquare, CheckSquareIcon, InfoIcon, PlusCircleIcon, SaveIcon } from "lucide-react"
+import { ArrowUpRightFromSquareIcon, CheckSquare, CheckSquareIcon, InfoIcon, PlusCircleIcon, SaveIcon, SendIcon } from "lucide-react"
 import { Usable, use, useMemo, useState } from "react"
 import {
   Dialog,
@@ -299,6 +301,8 @@ function TaskKanbanItem({task}: {task: Task}) {
 }
 
 function TaskInfoView({task}: {task: Task}) {
+  const [comment, setComment] = useState("")
+  const [comments, setComments] = useState(task.comments)
   return (
     <div className="flex flex-row h-full w-full">
       <div className="flex-1 w-full h-full">
@@ -314,7 +318,26 @@ function TaskInfoView({task}: {task: Task}) {
         </div>
         <div className="p-6">
           <div className="text-xl font-bold">
-            Comments
+            Comments ({task.comments.length})
+          </div>
+          <div className="flex flex-row gap-2 mt-2">
+            <Input placeholder="Add a comment..." value={comment} onChange={(e) => setComment(e.target.value)} />
+            <Button onClick={async () => {
+              const commentItem = await createTaskComment({
+                projectId: window.localStorage.getItem("activeProjectId") as string,
+                boardId: task.boardId as string,
+                stateId: task.stateId as string,
+                taskId: task.id as string,
+                content: comment,
+              })
+              setComment("")
+              setComments([...comments, commentItem])
+            }}><SendIcon />Send</Button>
+          </div>
+          <div className="mt-2">
+            {comments.map((comment) => (
+              <CommentItem key={comment.id} comment={comment} />
+            ))}
           </div>
         </div>
       </div>
@@ -335,6 +358,16 @@ function TaskInfoView({task}: {task: Task}) {
           <div><strong>Task ID:</strong> {task.id}</div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function CommentItem({comment}: {comment: TaskComment}) {
+  return (
+    <div className="p-2">
+      <div className="text-xs font-medium text-muted-foreground">{comment.user?.name ?? "Unknown"}</div>
+      <div className="text-sm">{comment.content}</div>
+      <div className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</div>
     </div>
   )
 }

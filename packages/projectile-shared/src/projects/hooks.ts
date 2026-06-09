@@ -180,6 +180,21 @@ export type UseUpdateTaskState = {
     error: string | null;
 };
 
+export type CreateTaskCommentInput = {
+    projectId: string;
+    boardId: string;
+    stateId: string;
+    taskId: string;
+    content: string;
+};
+
+export type CreateTaskCommentOptions = UseProjectsOptions;
+
+export type UseCreateTaskCommentState = {
+    creating: boolean;
+    error: string | null;
+};
+
 export type UseProjectState = {
     loaded: boolean;
     loading: boolean;
@@ -843,7 +858,7 @@ export async function updateTask(
     const apiUrl = getProjectsApiUrl({ apiUrl: options.apiUrl });
     const requestUrl = buildEndpointUrl(
         apiUrl,
-        `/project/p/${input.projectId}/b/${input.boardId}/s/${input.stateId}/tasks/${input.taskId}/update`,
+        `/project/p/${input.projectId}/b/${input.boardId}/s/${input.stateId}/t/${input.taskId}/update`,
     );
     const body: Record<string, string> = {
         name: input.name,
@@ -910,5 +925,105 @@ export function useUpdateTask(options: UpdateTaskOptions = {}) {
     return {
         ...state,
         updateTask: submit,
+    };
+}
+
+export async function createTaskComment(
+    input: CreateTaskCommentInput,
+    options: CreateTaskCommentOptions = {},
+) {
+    const sessionId = normalizeSessionId(
+        options.sessionId ?? getSessionIdFromCookie(),
+    );
+
+    if (!sessionId) {
+        throw new Error("Missing sessionId");
+    }
+
+    if (!input.projectId?.trim()) {
+        throw new Error("Missing projectId");
+    }
+
+    if (!input.boardId?.trim()) {
+        throw new Error("Missing boardId");
+    }
+
+    if (!input.stateId?.trim()) {
+        throw new Error("Missing stateId");
+    }
+
+    if (!input.taskId?.trim()) {
+        throw new Error("Missing taskId");
+    }
+
+    const apiUrl = getProjectsApiUrl({ apiUrl: options.apiUrl });
+    const requestUrl = buildEndpointUrl(
+        apiUrl,
+        `/project/p/${input.projectId}/b/${input.boardId}/s/${input.stateId}/t/${input.taskId}/comments/create`,
+    );
+    const body: Record<string, string> = {
+        content: input.content,
+    };
+
+    if (typeof document === "undefined") {
+        body.sessionId = sessionId;
+    }
+
+    const response = await fetch(requestUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: typeof document !== "undefined" ? "include" : "omit",
+        body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to create task comment: ${response.status}`);
+    }
+
+    return (await response.json()) as TaskComment;
+}
+
+export function useCreateTaskComment(options: CreateTaskCommentOptions = {}) {
+    const [state, setState] = useState<UseCreateTaskCommentState>({
+        creating: false,
+        error: null,
+    });
+
+    const submit = useCallback(
+        async (input: CreateTaskCommentInput) => {
+            setState({
+                creating: true,
+                error: null,
+            });
+
+            try {
+                const comment = await createTaskComment(input, options);
+
+                setState({
+                    creating: false,
+                    error: null,
+                });
+
+                return comment;
+            } catch (error) {
+                const message =
+                    error instanceof Error ? error.message : "Failed to create task comment";
+
+                setState({
+                    creating: false,
+                    error: message,
+                });
+
+                throw error;
+            }
+        },
+        [options.apiUrl, options.sessionId],
+    );
+
+    return {
+        ...state,
+        createTaskComment: submit,
     };
 }

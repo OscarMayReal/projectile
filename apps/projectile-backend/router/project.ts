@@ -3,7 +3,7 @@ import { AccountConnectionType, PrismaClient } from "../generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg";
 import { getVerifiedSessionFromRequest } from "../functions/session";
 import { createProject, getProjectById, getProjectsByUserId } from "../functions/project";
-import { createBoard, createTask, getBoardById, updateTask } from "../functions/board";
+import { createBoard, CreateComment, createTask, getBoardById, updateTask } from "../functions/board";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg(process.env.DATABASE_URL!),
@@ -126,7 +126,7 @@ router.post("/p/:projectid/b/:boardid/s/:stateid/tasks/create", async (req, res)
     }
 });
 
-router.put("/p/:projectid/b/:boardid/s/:stateid/tasks/:taskid/update", async (req, res) => {
+router.put("/p/:projectid/b/:boardid/s/:stateid/t/:taskid/update", async (req, res) => {
     const { name, description } = req.body;
     const { session } = await getVerifiedSessionFromRequest(req);
     const user = await prisma.user.findUnique({
@@ -146,6 +146,30 @@ router.put("/p/:projectid/b/:boardid/s/:stateid/tasks/:taskid/update", async (re
             stateId: req.params.stateid,
         })
         res.json(task);
+    } else {
+        res.status(403).json({ error: "Forbidden" })
+    }
+});
+
+router.post("/p/:projectid/b/:boardid/s/:stateid/t/:taskid/comments/create", async (req, res) => {
+    const { content } = req.body;
+    const { session } = await getVerifiedSessionFromRequest(req);
+    const user = await prisma.user.findUnique({
+        where: {
+            userConnectionId_accountConnectionType: {
+                userConnectionId: session.user.id,
+                accountConnectionType: AccountConnectionType.KeyStone,
+            },
+        },
+    })
+    const project = await getProjectById(req.params.projectid)
+    if (project && project.permissions.some((permission) => permission.userId === user?.id)) {
+        const comment = await CreateComment({
+            taskId: req.params.taskid,
+            content,
+            createdBy: user!.id,
+        })
+        res.json(comment);
     } else {
         res.status(403).json({ error: "Forbidden" })
     }
