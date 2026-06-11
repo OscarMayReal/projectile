@@ -25,7 +25,7 @@ export function AuthManager({children}: {children: React.ReactNode}) {
             const url = new URL(window.location.href);
             url.searchParams.delete('sessionId');
             window.location.href = url.toString();
-            document.cookie = `sessionId=${sessionId}; path=/; max-age=3600`;
+            document.cookie = `sessionId=${sessionId}; path=/; max-age=86400`;
         }
     }, []);
     return (
